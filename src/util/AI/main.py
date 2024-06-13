@@ -18,6 +18,23 @@ labels = ['bat_den_1', 'bat_den_2', 'bat_den_3', 'bat_quat_1', 'bat_quat_2', 'ba
           'mo_cua', 'tat_den_1', 'tat_den_2', 'tat_den_3', 'tat_quat_1', 'tat_quat_2', 'tat_quat_3']
 import lb
 
+dict_labels = {
+    'bat_den_1': [1, 1, 0, 0],
+    'bat_den_2': [1, 2, 0, 0],
+    'bat_den_3': [1, 3, 0, 0],
+    'bat_quat_1': [1, 0, 1, 0],
+    'bat_quat_2': [1, 0, 2, 0],
+    'bat_quat_3': [1, 0, 3, 0],
+    'tat_den_1': [0, 1, 0, 0],
+    'tat_den_2': [0, 2, 0, 0],
+    'tat_den_3': [0, 3, 0, 0],
+    'tat_quat_1': [0, 0, 1, 0],
+    'tat_quat_2': [0, 0, 2, 0],
+    'tat_quat_3': [0, 0, 3, 0],
+    'mo_cua': [1, 0, 0, 1],
+    'dong_cua': [0, 0, 0, 1],
+}
+
 
 def load_weights(model, weights, PRINT=False):
     # Load weights into model.
@@ -193,23 +210,6 @@ setup_classes_labels(
 
 
 def prediction(file_name):
-    dict_label = {
-        'bat_den_1': [1, 1, 0, 0],
-        'bat_den_2': [1, 2, 0, 0],
-        'bat_den_3': [1, 3, 0, 0],
-        'bat_quat_1': [1, 0, 1, 0],
-        'bat_quat_2': [1, 0, 2, 0],
-        'bat_quat_3': [1, 0, 3, 0],
-        'tat_den_1': [0, 1, 0, 0],
-        'tat_den_2': [0, 2, 0, 0],
-        'tat_den_3': [0, 3, 0, 0],
-        'tat_quat_1': [0, 0, 1, 0],
-        'tat_quat_2': [0, 0, 2, 0],
-        'tat_quat_3': [0, 0, 3, 0],
-        'mo_cua': [1, 0, 0, 1],
-        'dong_cua': [0, 0, 0, 1],
-    }
-
     import librosa
     import soundfile as sf
     # Resample audio received to 16000 Hz
@@ -224,4 +224,4 @@ def prediction(file_name):
         filename=os.getcwd() + f'\\src\\resources\\audio_resampled\\{file_name}_resampled.wav')
 
     class_predicted = model.predict_audio_label(audio)
-    return class_predicted, dict_label[class_predicted]
+    return class_predicted, dict_labels[class_predicted]

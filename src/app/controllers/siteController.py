@@ -11,19 +11,11 @@ import os
 from datetime import datetime
 import pytz
 
-# Get the current time in UTC
+
 utc_now = datetime.now(pytz.utc)
-
-# Define the UTC+7 timezone
 utc_plus_7 = pytz.timezone('Asia/Bangkok')
-
-# Convert the current time to UTC+7
 local_time = utc_now.astimezone(utc_plus_7)
-
-# Format the date and time
 formatted_time = local_time.strftime('%d_%m_%Y-%H-%M-%S')
-
-# Create the file name
 file_name = f"output_{formatted_time}"
 
 
