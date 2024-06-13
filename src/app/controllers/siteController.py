@@ -5,46 +5,59 @@ from util.AI.main import prediction
 
 from pydub import AudioSegment
 import requests
+from colorama import Fore, Back, Style
+
+import os
+from datetime import datetime
+import pytz
+
+# Get the current time in UTC
+utc_now = datetime.now(pytz.utc)
+
+# Define the UTC+7 timezone
+utc_plus_7 = pytz.timezone('Asia/Bangkok')
+
+# Convert the current time to UTC+7
+local_time = utc_now.astimezone(utc_plus_7)
+
+# Format the date and time
+formatted_time = local_time.strftime('%d_%m_%Y-%H-%M-%S')
+
+# Create the file name
+file_name = f"output_{formatted_time}"
 
 
 class SiteController:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
-
     def getLabel(request):
         # print(request.)
         audio_file = request.files['audio']
-        print(audio_file)
         if audio_file.filename == '':
             data = {"text": "NOT FOUND FILES AUDIO/WAV"}
             return Response(response=json.dumps(data), status=304,
                             mimetype='application/json')
-        print(os.getcwd())
+
+        print(Fore.YELLOW, 'Audio name: ', f'{file_name}.wav', Fore.WHITE)
         audio_file.save(
-            os.getcwd() + ('\\src\\resources\\audio\\output.wav'))
+            os.getcwd() + f'\\src\\resources\\audio\\{file_name}.wav')
 
-        label = prediction()
-        print(label)
-
+        label, decodedLabel = prediction(file_name)
+        print(Fore.RED, '> Label Predicted: ' + label)
+        print(Fore.BLUE, '> Calling API to active this action: ' + label)
         # Send request to ServerFirmware
         # body Json
         # Prepare the JSON data
-        json_data = {"label": label, "idRoom": request.form['idRoom']}
+        json_data = {"label": decodedLabel}
         url = "https://api.tugino.com:4501/devices/updateByAudio"
-
         response = requests.put(url, json=json_data)
 
+        print(Fore.GREEN, '> Call API successfully', Fore.WHITE)
+
         if response.status_code == 200:
-            resp = Response(response=json.dumps('successful'), status=200,
-                            mimetype='application/json')
+            resp = Response(response=json.dumps({
+                'label': label
+            }), status=200, mimetype='application/json')
         else:
             resp = Response(response=json.dumps('failed'), status=400,
                             mimetype='application/json')
-        # return Response(response=json.dumps('successful'), status=200,
-        #                 mimetype='application/json')
 
         return resp

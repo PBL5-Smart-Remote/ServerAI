@@ -1,4 +1,5 @@
 
+
 import sys
 import matplotlib.pyplot as plt
 from sklearn import metrics
@@ -12,12 +13,10 @@ import numpy as np
 DIR = os.getcwd() + '\\src\\util\\AI'
 print(DIR)
 sys.path.append(DIR + '\\utils')
+
+labels = ['bat_den_1', 'bat_den_2', 'bat_den_3', 'bat_quat_1', 'bat_quat_2', 'bat_quat_3', 'dong_cua',
+          'mo_cua', 'tat_den_1', 'tat_den_2', 'tat_den_3', 'tat_quat_1', 'tat_quat_2', 'tat_quat_3']
 import lb
-
-DATASET_DIRECTORY_PATH = 'f:\Code\PBL5\AI'+'/Data_Test/DataTraining'
-train_audio_path = DATASET_DIRECTORY_PATH+"/"
-
-labels = os.listdir(train_audio_path)
 
 
 def load_weights(model, weights, PRINT=False):
@@ -193,13 +192,7 @@ setup_classes_labels(
     load_classes_from=DIR+"/config/classes.names", model=model)
 
 
-def prediction():
-    import audioop
-
-    file = wave.open(
-        os.getcwd() + '\\src\\resources\\audio\\output.wav', 'rb')
-    print('get file')
-
+def prediction(file_name):
     dict_label = {
         'bat_den_1': [1, 1, 0, 0],
         'bat_den_2': [1, 2, 0, 0],
@@ -219,13 +212,16 @@ def prediction():
 
     import librosa
     import soundfile as sf
-    
+    # Resample audio received to 16000 Hz
     audio, sr = librosa.load(
-        os.getcwd() + '\\src\\resources\\audio\\output.wav', sr=44100)
-
+        os.getcwd() + f'\\src\\resources\\audio\\{file_name}.wav', sr=None)
     audio_resampled = librosa.resample(audio, orig_sr=sr, target_sr=16000)
-    sf.write(os.getcwd() + '\\src\\resources\\audio\\output_inc_resampled.wav',
+    sf.write(os.getcwd() + f'\\src\\resources\\audio_resampled\\{file_name}_resampled.wav',
              audio_resampled, 16000)
+
+    # Redict audio already resampled to 16000 Hz
     audio = lb.AudioClass(
-        filename=os.getcwd() + '\\src\\resources\\audio\\output_inc_resampled.wav')
-    return dict_label[model.predict_audio_label(audio)]
+        filename=os.getcwd() + f'\\src\\resources\\audio_resampled\\{file_name}_resampled.wav')
+
+    class_predicted = model.predict_audio_label(audio)
+    return class_predicted, dict_label[class_predicted]
